@@ -1,8 +1,14 @@
+local settings = require("src/settings")
+
 local function animationToggleUpdate(group, values, changedValue, selected)
+    animationEnabled = selected
+    PersistentDB:SetBool("animationEnabled", animationEnabled)
+    print ("RipperScape: animationEnabled set to ", animationEnabled)
 end
 
 local function volumeUpdate(slider, sliderValue)
     audioParameters.volume = sliderValue
+    print ("RipperScape: volume set to ", audioParameters.volume);
 end
 
 local function activationChanceUpdate(field, textboxValue)
@@ -10,14 +16,26 @@ local function activationChanceUpdate(field, textboxValue)
         return false
     end
     jumpscareProbability = round(tonumber(textboxValue))
+    PersistentDB:SetInt("jumpscareProbability", jumpscareProbability)
+    print ("RipperScape: jumpscareProbability set to ", jumpscareProbability)
 end
 
 local function jumpscareButton(button)
     print ("Jumpscare manually triggered")
     logicCounter = 0
-    jumpscareActive = true
+    if (animationEnabled) then
+        playAnimation = true
+    end
+    if (audioParameters.volume ~= 0) then
+        audio.Play(Plugin.resources.scabariteDeath, audioParameters) -- profane scabarite death [ID: 57656] sfx
+    end
 end
 
+local function resetPersistentDB()
+    deletePersistentDB()
+    fixPersistentDB()
+    getPersistentDBValues()
+end
 
 local ripperScapeSettings 
 function onSettingsLayerReady(settingsLayerReadyEvent)
@@ -25,42 +43,51 @@ function onSettingsLayerReady(settingsLayerReadyEvent)
     if ripperScapeSettings then ripperScapeSettings:Destroy() end
     local settingsTab = prettyui.SimpleView.new(rootLayer, { width = rootLayer.width, height = rootLayer.height })
     ripperScapeSettings = settingsTab
-    settingsTab:AddText({
+    local toggleTitle = settingsTab:AddText({
         text = "Toggles", 
         tooltip = "Disables the jumpscare animation. Audio is still played unless volume is set to 0." 
     })
-    settingsTab:AddCheckboxButton({{ 
+    local animationCheckbox = settingsTab:AddCheckboxButton({{ 
         text = "Animation", 
         value = 1, 
         selected = true }}, 
         {onChange = animationToggleUpdate }
         )
-    settingsTab:AddText({
+    local volumeTitle = settingsTab:AddText({
         text = "Volume slider", 
         tooltip = "Plugin volume slider. Plugin audio ignores game client settings including global mute. 0 disables audio playback." 
     })
-    settingsTab:AddSlider({ 
+    local volumeSlider = settingsTab:AddSlider({ 
         min = 0, 
         max = 1, 
         value = 0.5, 
         step = 0.1, 
         onChange = volumeUpdate
     })
-    settingsTab:AddText({ 
+    local activationChanceTitle = settingsTab:AddText({ 
         text = "Activation chance [0-99999]",
         tooltip = "Every second, a number between 0 and this number is rolled. If this number is hit, a jumpscare occurs. Default is 10000. Non-integer inputs will be rejected." 
     })
-    settingsTab:AddTextField({ 
+    local activationChanceBox = settingsTab:AddTextField({ 
         placeholder = "0", 
         text = 10000,
         onSubmit = activationChanceUpdate,
         maxLength = 5
     })
-    settingsTab:AddFancyButton(
-        "Trigger Jumpscare", 
+    local jumpscareButton = settingsTab:AddFancyButton(
+        "Trigger jumpscare", 
         jumpscareButton, 
-        { marginTop = 70, 
+        { width = 270,
+        marginTop = 70, 
         tooltip = "Is elaboration necessary?", 
+        variant = "positive" 
+    })
+    local resetSettingsButton = settingsTab:AddFancyButton(
+        "Clear data", 
+        resetSettings, 
+        { width = 270,
+        inline = true,
+        tooltip = "Clear all plugin data.",
         variant = "positive" 
     })
 end
