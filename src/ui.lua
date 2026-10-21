@@ -43,7 +43,7 @@ function onSettingsLayerReady(settingsLayerReadyEvent)
         min = 0, 
         max = 1, 
         value = 0.5, 
-        step = 0.01, 
+        step = 0.1, 
         onChange = volumeUpdate
     })
     settingsTab:AddText({ 

@@ -26,7 +26,6 @@ local currentFrame = 1 -- current frame of animFrames displayed by the jumpscare
 logicCounter = 0 -- logic event triggers 50x per second, this counter is used to more precisely control how often events happen
 jumpscareActive = false -- determines if the plugin is rolling to jumpscare, or if a jumpscare is happening
 jumpscareProbability = 10000 -- RNG check is between 0 and this number, must hit this number to trigger. 
-audioVolume = 0.5
 
 -- Jumpscare sprite and audioParameter properties
 jumpscare = ui.Sprite.new(game_window)
@@ -36,8 +35,8 @@ jumpscare:SetPos(0,0,0.0,0)
 audioParameters = audio.SoundPlaybackParams.new()
 audioParameters.type = audio.SoundType.SCRIPT
 audioParameters.audioBus = audio.AudioBus.MASTER
-audioParameters.volume = audioVolume
-audioParameters.delayTick = 0
+audioParameters.volume = 0.5
+audioParameters.delayTick = 1
 
 local function logicTick(event) -- main loop; divided between jumpscare behaviour and the rng tick every second to see if it should begin the jumpscare
     logicCounter = logicCounter + 1
@@ -45,10 +44,9 @@ local function logicTick(event) -- main loop; divided between jumpscare behaviou
     if (jumpscareActive) then -- jumpscare behaviour; code should be self-explanatory
         if (logicCounter == 2) then
             logicCounter = 0
-            jumpscare.alpha = 1
             jumpscare.sprite = animFrames[currentFrame]
             if (currentFrame == 1) then
-                audio.Play(Plugin.resources.scabariteDeath, audioParameters) -- profane scabarite death sfx
+                jumpscare.alpha = 1
             end
             if (currentFrame < 16) then
                 currentFrame = currentFrame + 1
@@ -64,7 +62,12 @@ local function logicTick(event) -- main loop; divided between jumpscare behaviou
             randomTick = round(random(0,jumpscareProbability))
             if (randomTick == jumpscareProbability) then
                 print ("Jumpscare triggered")
-                jumpscareActive = true
+                if (playAnimation = true) then
+                    jumpscareActive = true
+                end
+                if (audioParameters.volume ~= 0) then
+                    audio.Play(Plugin.resources.scabariteDeath, audioParameters) -- profane scabarite death [ID: 57656] sfx
+                end
             end
         end
     end
