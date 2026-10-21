@@ -37,6 +37,7 @@ audioParameters = audio.SoundPlaybackParams.new()
 audioParameters.type = audio.SoundType.SCRIPT
 audioParameters.audioBus = audio.AudioBus.MASTER
 audioParameters.volume = audioVolume
+audioParameters.delayTick = 0
 
 local function logicTick(event) -- main loop; divided between jumpscare behaviour and the rng tick every second to see if it should begin the jumpscare
     logicCounter = logicCounter + 1
@@ -47,7 +48,7 @@ local function logicTick(event) -- main loop; divided between jumpscare behaviou
             jumpscare.alpha = 1
             jumpscare.sprite = animFrames[currentFrame]
             if (currentFrame == 1) then
-                audio.Play(57656, audioParameters) -- profane scabarite death sfx
+                audio.Play(Plugin.resources.scabariteDeath, audioParameters) -- profane scabarite death sfx
             end
             if (currentFrame < 16) then
                 currentFrame = currentFrame + 1

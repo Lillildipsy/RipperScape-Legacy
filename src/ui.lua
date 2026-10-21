@@ -59,7 +59,7 @@ function onSettingsLayerReady(settingsLayerReadyEvent)
     settingsTab:AddFancyButton(
         "Trigger Jumpscare", 
         jumpscareButton, 
-        { marginTop = 80, 
+        { marginTop = 70, 
         tooltip = "Is elaboration necessary?", 
         variant = "positive" 
     })
