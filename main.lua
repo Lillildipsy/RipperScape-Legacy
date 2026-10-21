@@ -1,10 +1,8 @@
 -- Dependencies / game window
-
 local pluginUI = require("src/ui")
-local settings = require("src/settings")
 game_window = ui.Interfaces:GetComponent(id.Component.TOPLEVEL_V2__PLUGIN_BUILD_LAYER_TOP)
 
--- Global functions
+-- Math functions
 
 function round(num) -- used when generating random numbers to ensure that it only produces whole numbers
     return math.floor(num + 0.5)
@@ -58,9 +56,9 @@ function fixPersistentDB()
 end
 
 function getPersistentDBValues()-- Set variables to PersistentDB entries
-    jumpscareProbability = PersistentDB:Get("jumpscareProbability")
-    audioVolume = PersistentDB:Get("audioVolume")
-    animationEnabled = PersistentDB:Get("animationEnabled")
+    jumpscareProbability = round(PersistentDB:Get("jumpscareProbability"))
+    audioVolume = PersistentDB:GetFloat("audioVolume")
+    animationEnabled = PersistentDB:GetBool("animationEnabled")
 end
 
 fixPersistentDB()
@@ -99,7 +97,7 @@ local function logicTick(event) -- main loop; divided between jumpscare behaviou
             logicCounter = 0
             randomTick = round(random(0,jumpscareProbability))
             if (randomTick == jumpscareProbability) then
-                print ("Jumpscare triggered")
+                print ("Ripperscape: Jumpscare triggered")
                 if (animationEnabled) then
                     playAnimation = true
                 end

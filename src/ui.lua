@@ -1,5 +1,3 @@
-local settings = require("src/settings")
-
 local function animationToggleUpdate(group, values, changedValue, selected)
     animationEnabled = selected
     PersistentDB:SetBool("animationEnabled", animationEnabled)
@@ -7,8 +5,10 @@ local function animationToggleUpdate(group, values, changedValue, selected)
 end
 
 local function volumeUpdate(slider, sliderValue)
-    audioParameters.volume = sliderValue
-    print ("RipperScape: volume set to ", audioParameters.volume);
+    audioValue = sliderValue
+    audioParameters.volume = audioValue
+    PersistentDB:SetFloat("audioVolume", audioValue)
+    print ("RipperScape: volume set to ", audioValue);
 end
 
 local function activationChanceUpdate(field, textboxValue)
@@ -21,7 +21,7 @@ local function activationChanceUpdate(field, textboxValue)
 end
 
 local function jumpscareButton(button)
-    print ("Jumpscare manually triggered")
+    print ("Ripperscape: Jumpscare manually triggered")
     logicCounter = 0
     if (animationEnabled) then
         playAnimation = true
@@ -50,7 +50,7 @@ function onSettingsLayerReady(settingsLayerReadyEvent)
     local animationCheckbox = settingsTab:AddCheckboxButton({{ 
         text = "Animation", 
         value = 1, 
-        selected = true }}, 
+        selected = animationEnabled }}, 
         {onChange = animationToggleUpdate }
         )
     local volumeTitle = settingsTab:AddText({
@@ -60,7 +60,7 @@ function onSettingsLayerReady(settingsLayerReadyEvent)
     local volumeSlider = settingsTab:AddSlider({ 
         min = 0, 
         max = 1, 
-        value = 0.5, 
+        value = audioVolume, 
         step = 0.1, 
         onChange = volumeUpdate
     })
@@ -70,7 +70,7 @@ function onSettingsLayerReady(settingsLayerReadyEvent)
     })
     local activationChanceBox = settingsTab:AddTextField({ 
         placeholder = "0", 
-        text = 10000,
+        text = jumpscareProbability,
         onSubmit = activationChanceUpdate,
         maxLength = 5
     })
